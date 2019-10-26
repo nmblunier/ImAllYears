@@ -1,8 +1,11 @@
 -- Timezone code from http://lua-users.org/wiki/TimeZone
 -- Compute the difference in seconds between local time and UTC.
 local function get_timezone()
-  local now = os.time()
-  return os.difftime(now, os.time(os.date("!*t", now)))
+    ts = now
+    local utcdate   = os.date("!*t", ts)
+    local localdate = os.date("*t", ts)
+    localdate.isdst = true -- this is the trick
+    return os.difftime(os.time(localdate), os.time(utcdate))
 end
 
 local function EventTableFromString( events, input )
@@ -106,7 +109,7 @@ function Update()
 			SKIN:Bang('!SetOption', 'EventBackground'..i, 'Hidden', 1)
 		else
 			SKIN:Bang('!SetOption', 'EventBackground'..i, 'Hidden', 0)
-			SKIN:Bang('!SetOption', 'EventWeekday'..i, 'Text', os.date('%a',events[i]['timecode']))
+			SKIN:Bang('!SetOption', 'EventWeekday'..i, 'Text', os.date('%b',events[i]['timecode']))
 			SKIN:Bang('!SetOption', 'EventDay'..i, 'Text', tonumber(os.date('%d',events[i]['timecode'])))
 			if (events[i]['allday']==false) then 
 				SKIN:Bang('!SetOption', 'EventTime'..i, 'Text', os.date('%H:%M',events[i]['timecode']))

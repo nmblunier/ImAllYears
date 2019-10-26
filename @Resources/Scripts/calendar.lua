@@ -1,8 +1,11 @@
 -- Timezone code from http://lua-users.org/wiki/TimeZone
 -- Compute the difference in seconds between local time and UTC.
 local function get_timezone()
-  local now = os.time()
-  return os.difftime(now, os.time(os.date("!*t", now)))
+    ts = now
+    local utcdate   = os.date("!*t", ts)
+    local localdate = os.date("*t", ts)
+    localdate.isdst = true -- this is the trick
+    return os.difftime(os.time(localdate), os.time(utcdate))
 end
 
 local function has_value (tab, subval, val)
@@ -188,6 +191,7 @@ function FillCalendar()
 					SKIN:Bang('!SetOption', 'D'..i..j, 'MeterStyle', 'sDayDefault|sDayToday')
 				elseif has_value(holidays,'daycode',time_counter) then		-- check if exists in holiday calendar
 					SKIN:Bang('!SetOption', 'D'..i..j, 'MeterStyle', 'sDayDefault|sDayHoliday')
+					SKIN:Bang('!SetOption', 'D'..i..j, 'LeftMouseUpAction', 'https://calendar.google.com/calendar/r/day/'..tonumber(os.date('%Y', time_counter))..'/'..tonumber(os.date('%m', time_counter))..'/'..tonumber(os.date('%d', time_counter)))
 				elseif tonumber(os.date('%w',time_counter)) == 6 or tonumber(os.date('%w',time_counter)) == 0 then		-- is it a weekend?
 					SKIN:Bang('!SetOption', 'D'..i..j, 'MeterStyle', 'sDayDefault|sDayWeekend')
 				end
